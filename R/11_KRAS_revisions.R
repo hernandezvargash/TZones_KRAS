@@ -1,5 +1,8 @@
 # Revisions received on 22/05/25
 # Deadline: end of June
+# New revisions: 11/08/25
+# Deadline: 25 September
+
 
 # libraries ---------------------------------------------------------------
 
@@ -26,7 +29,8 @@ suppressPackageStartupMessages({
 
 set.seed(1)
 
-results.dir <- "manuscript/KRAS/revisions_June_2025/"
+#results.dir <- "manuscript/KRAS/revisions_June_2025/"
+results.dir <- "manuscript/KRAS/revisions_Aug_2025/"
 data.dir <- "KRAS_model/objects/"
 
 
@@ -88,6 +92,32 @@ Convert(paste0(data.dir, "all.cells.h5Seurat"), dest = "h5ad", overwrite = TRUE)
 
 
 saveRDS(int.sct, file = paste0(data.dir, "all.cells_manuscript.rds"))
+
+
+# Aug 2025
+# DimPlot with all cells, split by sample
+
+int.sct <- readRDS(file = paste0(data.dir, "all.cells_manuscript.rds"))
+head(int.sct[[]])
+
+levels(int.sct$cell_type)
+Idents(int.sct) <- factor(int.sct$cell_type,
+                          levels = c("Mesenchymal cells", "Stratified epithelium", "Immune cells", 
+                                     "Glandular epithelium", "Anal gland", "Hair follicle", "Colonocyte-like"))
+
+DimPlot(int.sct, label = F, label.box = T, repel = T) +
+  ggtitle("Total Cells")
+ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.2A.png"), width = 7, height = 5)
+
+DimPlot(int.sct, 
+        split.by = "condition",
+        label = F, label.box = T, repel = T) +
+  ggtitle("Total Cells")
+ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.2A.split.png"), width = 18, height = 5)
+
+table(int.sct$condition)
+# A.Normal B.Hyperplasia   C.Dysplasia   D.Carcinoma 
+# 2972          3015          5020          6714 
 
 
 ## proportions ----
@@ -175,6 +205,29 @@ saveRDS(stratified, file = paste0(data.dir, "stratified_manuscript.rds"))
 DimPlot(stratified, label = F, label.box = T, repel = T) + 
   ggtitle("Stratified cells")
 ggsave(filename = paste0(results.dir, "stratified.identities.png"), width = 7, height = 4)
+
+
+# August 2025
+
+stratified <- readRDS(file = paste0(data.dir, "stratified_manuscript.rds"))
+
+Idents(stratified) <- stratified$cell_type
+
+DimPlot(stratified, label = F, label.box = T, repel = T) + 
+  ggtitle("Stratified cells")
+ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.2B.png"), width = 8, height = 5)
+
+DimPlot(stratified, 
+        pt.size = 1.5,
+        split.by = "condition",
+        label = F, label.box = T, repel = T) +
+  ggtitle("Stratified cells")
+ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.S3G.split.png"), width = 18, height = 5)
+
+table(stratified$condition)
+# A.Normal B.Hyperplasia   C.Dysplasia   D.Carcinoma 
+#  151           304          2162          2661 
+
 
 
 ## proportions ----
@@ -884,6 +937,29 @@ DimPlot(immune, label = F, label.box = T, repel = T) +
 ggsave(filename = paste0(results.dir, "immune.identities.png"), width = 7, height = 6)
 
 
+# August 2025
+
+immune <- readRDS(file = paste0(data.dir, "immune_manuscript.rds"))
+
+Idents(immune) <- immune$cell_type
+
+DimPlot(immune, label = F, label.box = T, repel = T) + 
+  ggtitle("Immune cells")
+ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.3A.png"), width = 7, height = 6)
+
+DimPlot(immune, 
+        split.by = "condition",
+        label = F, label.box = T, repel = T) +
+  ggtitle("Immune cells")
+ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.S6C.split.png"), width = 16, height = 5)
+
+table(immune$condition)
+# A.Normal B.Hyperplasia   C.Dysplasia   D.Carcinoma 
+# 1318           492          1710          1954
+
+
+
+
 ## proportions ----
 
 table(immune$cell_type)
@@ -1008,6 +1084,8 @@ saveRDS(t_ILC, file = paste0(data.dir, "t_ILC_manuscript.rds"))
 
  
 # compositional analyses ----
+
+## sscomp ----
 # https://github.com/MangiolaLaboratory/sccomp
 
 library(dplyr)
@@ -1017,7 +1095,7 @@ library(forcats)
 library(tidyr)
 
 
-## stratified ----
+### stratified ----
 
 # using group as continuous
 # similar results in pairwise categorial comparisons
@@ -1095,7 +1173,7 @@ ggsave(filename = paste0(results.dir, "stratified.151.identities_grouped.by.stag
 saveRDS(stratified, file = paste0(data.dir, "stratified_manuscript.rds"))
 
 
-## immune ----
+### immune ----
 
 immune <- readRDS(file = paste0(data.dir, "immune_manuscript.rds"))
 immune$sample <- factor(immune$sample, levels = c("Normal","Hyperplasia","Dysplasia","Carcinoma"))
@@ -1172,6 +1250,211 @@ ggsave(filename = paste0(results.dir, "immune.492.identities_grouped.by.stage.pn
 
 
 saveRDS(immune, file = paste0(data.dir, "immune_manuscript.rds"))
+
+
+## miloR ----
+# as suggested by the August reviews
+# https://pmc.ncbi.nlm.nih.gov/articles/PMC7617075/
+# https://github.com/MarioniLab/miloR?tab=readme-ov-file
+
+library(miloR)
+library(SingleCellExperiment)
+library(scater)
+library(scran)
+library(dplyr)
+library(patchwork)
+library(Seurat)
+
+
+### stratified ----
+
+stratified <- readRDS(file = paste0(data.dir, "stratified_manuscript.rds"))
+head(stratified)
+stratified$sample <- factor(stratified$sample, levels = c("Normal","Hyperplasia","Dysplasia","Carcinoma"))
+
+DimPlot(stratified, group.by = "cell_type")
+DimPlot(stratified, #pt.size = 0.2,
+        split.by = "sample",
+        group.by = "cell_type") +
+  ggtitle("")
+
+pca_embeddings <- stratified[["pca"]]@cell.embeddings
+umap_embeddings <- stratified[["umap"]]@cell.embeddings
+sce <- as.SingleCellExperiment(stratified)
+reducedDim(sce, "PCA", withDimnames = TRUE) <- pca_embeddings
+reducedDim(sce, "UMAP", withDimnames = TRUE) <- umap_embeddings
+reducedDimNames(sce)
+
+#sce <- sce[,apply(reducedDim(sce, "PCA"), 1, function(x) !all(is.na(x)))]
+#sce <- runUMAP(sce, dimred = "PCA", name = 'umap')
+#plotReducedDim(sce, colour_by="condition", dimred = "umap") 
+
+milo <- Milo(sce)
+milo <- buildGraph(milo, k = 30, d = 30, reduced.dim = "PCA")
+milo <- makeNhoods(milo, prop = 0.1, k = 30, d=30, 
+                   refined = TRUE, reduced_dims = "PCA")
+plotNhoodSizeHist(milo)
+
+milo <- countCells(milo, 
+                   meta.data = as.data.frame(colData(milo)), 
+                   sample="orig.ident")
+head(nhoodCounts(milo))
+
+milo <- calcNhoodDistance(milo, d=30, reduced.dim = "PCA")
+
+design <- data.frame(colData(milo))[,c("orig.ident", "condition", "type.continuous")]
+head(design)
+# changing to numeric doesn't seem to change the result:
+design$type.continuous <- as.numeric(factor(design$condition))
+table(design$type.continuous)
+table(design$condition)
+design <- distinct(design)
+rownames(design) <- design$orig.ident
+design
+
+da_results <- testNhoods(milo, 
+#                         design = ~condition, 
+                         design = ~type.continuous, 
+#                         design = ~as.numeric(type.continuous), 
+                         design.df=design[colnames(nhoodCounts(milo)), ])
+head(da_results)
+da_results %>%
+  arrange(SpatialFDR) %>%
+  head() 
+
+ggplot(da_results, aes(PValue)) + geom_histogram(bins=50)
+ggplot(da_results, aes(logFC, -log10(SpatialFDR))) + 
+  geom_point() +
+  geom_hline(yintercept = 1) ## Mark significance threshold (10% FDR)
+
+milo <- buildNhoodGraph(milo)
+
+## Plot single-cell UMAP
+umap_pl <- plotReducedDim(milo, dimred = "UMAP", colour_by="condition", text_by = "cell_type", 
+                          text_size = 3, point_size=0.5) +
+  guides(fill="none")
+
+## Plot neighbourhood graph
+nh_graph_pl <- plotNhoodGraphDA(milo, da_results, layout="UMAP",alpha=0.1) 
+
+umap_pl + nh_graph_pl +
+  plot_layout(guides="collect")
+ggsave(filename = paste0(results.dir, "milo_stratified_umap_nhoods.png"), 
+       width = 12, height = 6, dpi = 300)
+
+da_results <- annotateNhoods(milo, da_results, coldata_col = "cell_type")
+head(da_results)
+
+ggplot(da_results, aes(cell_type_fraction)) + geom_histogram(bins=50)
+
+da_results$celltype <- ifelse(da_results$cell_type_fraction < 0.7, "Mixed", da_results$cell_type)
+da_results$celltype <- factor(da_results$celltype, 
+                              levels = c("Mixed",
+                                         "AC suprabasal distal",
+                                         "TZ",  
+                                         "Wounded cells",
+                                         "AC basal distal",
+                                         "AC suprabasal proximal",
+                                         "AC proliferative basal proximal",
+                                         "Reactive cells",
+                                         "EMT-like cells",
+                                         "AC basal proximal", 
+                                         "Cancerous cells"
+                              ))
+plotDAbeeswarm(da_results, group.by = "celltype")
+ggsave(filename = paste0(results.dir, "milo_stratified_beeswarm.png"), 
+       width = 9, height = 10, dpi = 300)
+
+write.csv(da_results, file = paste0(results.dir, "milo_stratified_results.csv"))
+
+
+
+
+### immune ----
+
+immune <- readRDS(file = paste0(data.dir, "immune_manuscript.rds"))
+DimPlot(immune, #pt.size = 0.2,
+        split.by = "sample",
+        group.by = "cell_type") +
+  ggtitle("")
+
+pca_embeddings <- immune[["pca"]]@cell.embeddings
+umap_embeddings <- immune[["umap"]]@cell.embeddings
+sce <- as.SingleCellExperiment(immune)
+reducedDim(sce, "PCA", withDimnames = TRUE) <- pca_embeddings
+reducedDim(sce, "UMAP", withDimnames = TRUE) <- umap_embeddings
+reducedDimNames(sce)
+
+milo <- Milo(sce)
+milo <- buildGraph(milo, k = 30, d = 30, reduced.dim = "PCA")
+milo <- makeNhoods(milo, prop = 0.1, k = 30, d=30, 
+                   refined = TRUE, reduced_dims = "PCA")
+plotNhoodSizeHist(milo)
+
+milo <- countCells(milo, 
+                   meta.data = as.data.frame(colData(milo)), 
+                   sample="orig.ident")
+head(nhoodCounts(milo))
+
+milo <- calcNhoodDistance(milo, d=30, reduced.dim = "PCA")
+
+design <- data.frame(colData(milo))[,c("orig.ident", "condition", "type.continuous")]
+head(design)
+table(design$type.continuous)
+table(design$condition)
+design <- distinct(design)
+rownames(design) <- design$orig.ident
+design
+
+da_results <- testNhoods(milo, 
+                         design = ~type.continuous, 
+                         design.df=design[colnames(nhoodCounts(milo)), ])
+head(da_results)
+da_results %>%
+  arrange(SpatialFDR) %>%
+  head() 
+
+ggplot(da_results, aes(PValue)) + geom_histogram(bins=50)
+ggplot(da_results, aes(logFC, -log10(SpatialFDR))) + 
+  geom_point() +
+  geom_hline(yintercept = 1) ## Mark significance threshold (10% FDR)
+
+milo <- buildNhoodGraph(milo)
+
+## Plot single-cell UMAP
+umap_pl <- plotReducedDim(milo, dimred = "UMAP", colour_by="condition", text_by = "cell_type", 
+                          text_size = 3, point_size=0.5) +
+  guides(fill="none")
+
+## Plot neighbourhood graph
+nh_graph_pl <- plotNhoodGraphDA(milo, da_results, layout="UMAP",alpha=0.1) 
+
+umap_pl + nh_graph_pl +
+  plot_layout(guides="collect")
+ggsave(filename = paste0(results.dir, "milo_immune_umap_nhoods.png"), 
+       width = 12, height = 6, dpi = 300)
+
+da_results <- annotateNhoods(milo, da_results, coldata_col = "cell_type")
+head(da_results)
+
+ggplot(da_results, aes(cell_type_fraction)) + geom_histogram(bins=50)
+
+da_results$celltype <- ifelse(da_results$cell_type_fraction < 0.7, "Mixed", da_results$cell_type)
+da_results$celltype <- factor(da_results$celltype, 
+                              levels = c("Mixed",
+                                         "Naive B cells",
+                                         "Myeloid cells",
+                                         "ILCs",
+                                         "T cells",
+                                         "B cells",
+                                         "Neutrophils"
+                              ))
+plotDAbeeswarm(da_results, group.by = "celltype")
+ggsave(filename = paste0(results.dir, "milo_immune_beeswarm.png"), 
+       width = 7, height = 7, dpi = 300)
+
+write.csv(da_results, file = paste0(results.dir, "milo_immune_results.csv"))
+
 
 
 
@@ -1827,6 +2110,7 @@ ggsave(filename = paste0(results.dir, "trajectories/Pathway_Activity_Scores_Pseu
 # GO_0005031: tumor necrosis factor receptor activity
 # GO_0070102: interleukin-6-mediated signaling pathway
 # GO_0005024: transforming growth factor beta receptor activity
+
 
 
 

@@ -1,5 +1,4 @@
 
-# 270723
 # KRAS model - Preprocessing after ZsGreen alignment
 
 # summary -----------------------------------------------------------------
@@ -21,7 +20,7 @@
 
 rm(list=ls())
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/KRAS_model")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat);  library(sctransform);  library(SeuratDisk); library(SeuratWrappers); library(SingleCellExperiment)
@@ -36,9 +35,6 @@ suppressPackageStartupMessages({
   library(TxDb.Mmusculus.UCSC.mm10.knownGene); library(org.Mm.eg.db); library(biomaRt)
   library(Scillus); library(Nebulosa)
   library(SingleCellSignalR)
-  library(Tempora)
-  library(infercnv)
-  library(SCENIC)
   library(snow)
   library(DoubletFinder)
 })
@@ -46,9 +42,9 @@ suppressPackageStartupMessages({
 set.seed(1)
 
 
-# loading from barcode matrices (don't run, only for testing) -----------------------------------------------------------------
+# loading from barcode matrices -----------------------------------------------------------------
 
-dirs <- list.dirs(path = "/mnt/sdb/Dropbox/BioInfo/Lab/TZones/shared/KRAS/matrices/ZsGreen", recursive = F, full.names = T)
+dirs <- list.dirs(path = "/KRAS/matrices/ZsGreen", recursive = F, full.names = T)
 names <- str_sub(dirs, 66, -1)
 
 list.samples <- list()

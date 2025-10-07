@@ -14,7 +14,7 @@
 
 rm(list=ls())
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat); library(SeuratDisk)

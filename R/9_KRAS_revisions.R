@@ -9,7 +9,7 @@
 rm(list=ls())
 gc()
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat);  library(sctransform);  library(SeuratDisk); #library(SeuratWrappers); library(SingleCellExperiment)
@@ -107,13 +107,13 @@ Idents(int.sct) <- factor(int.sct$cell_type,
 
 DimPlot(int.sct, label = F, label.box = T, repel = T) +
   ggtitle("Total Cells")
-ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.2A.png"), width = 7, height = 5)
+ggsave(filename = paste0(results.dir, "unbiased.umap.2A.png"), width = 7, height = 5)
 
 DimPlot(int.sct, 
         split.by = "condition",
         label = F, label.box = T, repel = T) +
   ggtitle("Total Cells")
-ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.2A.split.png"), width = 18, height = 5)
+ggsave(filename = paste0(results.dir, "unbiased.picked.umap.2A.split.png"), width = 18, height = 5)
 
 table(int.sct$condition)
 # A.Normal B.Hyperplasia   C.Dysplasia   D.Carcinoma 
@@ -215,14 +215,14 @@ Idents(stratified) <- stratified$cell_type
 
 DimPlot(stratified, label = F, label.box = T, repel = T) + 
   ggtitle("Stratified cells")
-ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.2B.png"), width = 8, height = 5)
+ggsave(filename = paste0(results.dir, "unbiased.picked.umap.2B.png"), width = 8, height = 5)
 
 DimPlot(stratified, 
         pt.size = 1.5,
         split.by = "condition",
         label = F, label.box = T, repel = T) +
   ggtitle("Stratified cells")
-ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.S3G.split.png"), width = 18, height = 5)
+ggsave(filename = paste0(results.dir, "unbiased.picked.umap.S3G.split.png"), width = 18, height = 5)
 
 table(stratified$condition)
 # A.Normal B.Hyperplasia   C.Dysplasia   D.Carcinoma 
@@ -879,14 +879,8 @@ Idents(immune) <- immune$customclassif
 Idents(immune) <- immune$seurat_clusters
 DimPlot(immune, label = T, label.box = T) + NoLegend()
 
-# I don't have the last version of the object
-# but "new.cell.labels" seem to match the last version of categories
-# some changes need to be made
-# remove "cancer cells" from neutrophil cluster
-# add Naive B cells from "customclassif" or "seurat_clusters"
-# group gd and T into "T cells"
 
-# is the colonocyte-like cluster here?
+# colonocyte-like cluster
 colo.like.genes <- c("Epcam", "Krt8", "Krt18", "Krt20a", "Cxcr2", 
                 "Cd24a", "Fcgr3", "S100a8", "S100a9", "Muc3", "Car4", "Saa1")
 FeaturePlot(immune, 
@@ -945,13 +939,13 @@ Idents(immune) <- immune$cell_type
 
 DimPlot(immune, label = F, label.box = T, repel = T) + 
   ggtitle("Immune cells")
-ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.3A.png"), width = 7, height = 6)
+ggsave(filename = paste0(results.dir, "unbiased.picked.umap.3A.png"), width = 7, height = 6)
 
 DimPlot(immune, 
         split.by = "condition",
         label = F, label.box = T, repel = T) +
   ggtitle("Immune cells")
-ggsave(filename = paste0(results.dir, "non.cherry.picked.umap.S6C.split.png"), width = 16, height = 5)
+ggsave(filename = paste0(results.dir, "unbiased.picked.umap.S6C.split.png"), width = 16, height = 5)
 
 table(immune$condition)
 # A.Normal B.Hyperplasia   C.Dysplasia   D.Carcinoma 
@@ -1067,8 +1061,6 @@ VlnPlot(immune, c("Il6","Tnf","Tgfb1"),
   geom_boxplot(aes(ymin = -Inf, ymax = Inf), 
                width = 0.3, alpha = 0.2, color = "white")
 ggsave(filename = paste0(results.dir, "violin_IL6_TNF_TGFB1_immune.png"), width = 12, height = 4)
-
-
 
 
 

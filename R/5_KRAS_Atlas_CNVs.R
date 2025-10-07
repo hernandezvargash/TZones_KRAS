@@ -13,7 +13,7 @@
 
 rm(list=ls())
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat);  library(sctransform);  library(SeuratDisk); library(SeuratWrappers); library(SingleCellExperiment)
@@ -26,9 +26,6 @@ suppressPackageStartupMessages({
   library(ggpubr); library(eulerr); library(alluvial)
   library(TxDb.Mmusculus.UCSC.mm10.knownGene); library(org.Mm.eg.db); library(biomaRt)
   library(Scillus); library(Nebulosa)
-  library(Tempora)
-  library(infercnv)
-  library(SCENIC)
   library(snow)
   
 })

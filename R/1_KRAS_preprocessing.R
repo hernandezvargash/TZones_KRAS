@@ -20,7 +20,7 @@
 
 rm(list=ls())
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat);  library(sctransform);  library(SeuratDisk); library(SeuratWrappers); library(SingleCellExperiment)
@@ -33,9 +33,6 @@ suppressPackageStartupMessages({
   library(ggpubr); library(eulerr); library(alluvial)
   library(TxDb.Mmusculus.UCSC.mm10.knownGene); library(org.Mm.eg.db); library(biomaRt)
   library(Scillus)
-  library(Tempora)
-  library(infercnv)
-  library(SCENIC)
   library(snow)
   library(DoubletFinder)
 })
@@ -66,26 +63,6 @@ for(i in 1:length(loom.files)){
 names(list.samples) <- names
 
 saveRDS(list.samples, file = "KRAS_model/objects/list.samples.rds")
-
-
-
-# loading from barcode matrices (don't run, only for testing) -----------------------------------------------------------------
-
-dirs <- list.dirs(path = "shared/KRAS/data/matrices", recursive = F, full.names = T)
-dirs <- dirs[c(6,4,3,1,5)]
-
-#names <- str_sub(dirs, 58, -1)
-names <- c("Normal","Hyperplasia.1","Hyperplasia.2","Dysplasia","Carcinoma")
-
-list.samples <- list()
-
-for(i in 1:length(dirs)){
-  list.samples[[i]] <- Read10X(data.dir = dirs[i])
-  list.samples[[i]] <- CreateSeuratObject(list.samples[[i]])
-  list.samples[[i]]$sample <- names[[i]]
-}
-
-names(list.samples) <- names
 
 
 

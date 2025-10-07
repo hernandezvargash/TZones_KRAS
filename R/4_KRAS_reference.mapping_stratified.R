@@ -14,7 +14,7 @@
 
 rm(list=ls())
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat); library(SeuratDisk)
@@ -178,9 +178,6 @@ ggplot(tab2b, aes(x = Condition, y = Proportion, fill = Cell_type)) +
   ggtitle("Atlas-transfered labels") +
   theme_ipsum() +
   xlab("")
-
-
-
 
 
 # Differential expression analysis ----

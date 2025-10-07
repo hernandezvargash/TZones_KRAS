@@ -1,26 +1,11 @@
 
 # KRAS model - subclustering within epithelial cells
 
-# summary -----------------------------------------------------------------
-
-# Integration of 4 different experiments:
-
-# Normal (RUN 380 – Experiment 07/07/2021)
-# Hyperplasia (RUN 381 – Experiment 20/07/2021)
-# Dysplasia (RUN 400 - Experiment 14/12/2021)
-# Carcinoma (RUN 354 – Experiment 02/03/2021)
-
-# it is recommended to split and reintegrate the object after subsetting, before re-doing the clustering. 
-# 4 approaches compared here: https://github.com/satijalab/seurat/issues/1883
-# below: Approach 2: SCT reintegration > Re-cluster (following Integration tutorial: https://satijalab.org/seurat/articles/integration_introduction.html#performing-integration-on-datasets-normalized-with-sctransform-1)
-# using RPCA for fast integration
-
-
 # libraries ---------------------------------------------------------------
 
 rm(list=ls())
 
-setwd("~/Dropbox/BioInfo/Lab/TZones/")
+setwd()
 
 suppressPackageStartupMessages({
   library(Seurat);  library(sctransform);  library(SeuratDisk); #library(SeuratWrappers); library(SingleCellExperiment)
@@ -33,9 +18,6 @@ suppressPackageStartupMessages({
   library(ggpubr); library(eulerr); library(alluvial)
   library(TxDb.Mmusculus.UCSC.mm10.knownGene); library(org.Mm.eg.db); library(biomaRt)
   library(Scillus)
-  #library(Tempora)
-  #library(infercnv)
-  #library(SCENIC)
   library(snow)
   
 })
@@ -195,7 +177,7 @@ load("sc.all.celltypes.RData")
 p1 <- DimPlot(cc.int.sct, cells.highlight = cells.9)
 p2 <- DimPlot(cc.int.sct)
 p2+p1
-# from Chloe: remove cluster 9 (rectum)
+# Remove cluster 9 (rectum)
 # This cluster presents several markers of rectum/glandular epithelium like Krt8, Krt19, 
 # Mucine expression (Muc3, Muc13) and other secretory associated genes.
 # Importantly, the different specific keratin of stratified epithelium (like Krt6, Krt1, Krt10, Krt14, Krt5 or Krt17) are not expressed in this cluster.
@@ -273,9 +255,6 @@ p2 <- ggplot(tab2b, aes(x = Sample, y = Proportion, fill = New_clusters)) +
   xlab("")
 
 p2
-
-
-
 
 
 # Differential expression analysis ----
